@@ -1,4 +1,4 @@
-/* ==========================================================================
+/*
  * @file    : socket.c
  *
  * @description : This file contains program for socket communication.
@@ -10,7 +10,7 @@
  *		Public License Version 2 or later at the following locations:
  *              http://www.opensource.org/licenses/gpl-license.html
  *              http://www.gnu.org/copyleft/gpl.html
- * ========================================================================*/
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -41,14 +41,14 @@ static int ip_is_valid(char *ip_str)
 	int num, dots = 0;
 	char *ptr;
 
-	if(ip_str == NULL)
+	if (ip_str == NULL)
 		return 0;
 
 	ptr = strtok(ip_str, ".");
-	if(ptr == NULL)
+	if (ptr == NULL)
 		return 0;
 
-	while(ptr != NULL) {
+	while (ptr != NULL) {
 		if (!valid_digit(ptr))
 			return 0;
 		num = atoi(ptr);
@@ -70,7 +70,7 @@ int init_udp(char *d_ip, int s_port, int d_port)
 	char ip[16] = {0};
 
 	strcpy(ip, d_ip);
-	if(!ip_is_valid(ip)) {
+	if (!ip_is_valid(ip)) {
 		printf("Invalid IP : %s\n", d_ip);
 		return -1;
 	}
@@ -85,7 +85,7 @@ int init_udp(char *d_ip, int s_port, int d_port)
 	s_addr_udp.sin_port = htons(s_port);
 	s_addr_udp.sin_addr.s_addr = inet_addr("0.0.0.0");
 
-	if(bind(fd_udp, (const struct sockaddr *)&s_addr_udp,
+	if (bind(fd_udp, (const struct sockaddr *)&s_addr_udp,
 		sizeof(struct sockaddr_in)) < 0) {
 		printf("ERROR : SOCKET BIND\n");
 		return -1;

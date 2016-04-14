@@ -1,4 +1,4 @@
-/* ==========================================================================
+/*
  * @file    : event_control.c
  *
  * @description : This file contains program to control input events remotely.
@@ -10,7 +10,7 @@
  *		Public License Version 2 or later at the following locations:
  *              http://www.opensource.org/licenses/gpl-license.html
  *              http://www.gnu.org/copyleft/gpl.html
- * ========================================================================*/
+ */
 
 #include <signal.h>
 #include <stdio.h>
@@ -64,7 +64,7 @@ static int init_device(int argc, char **argv,
 	int opt;
 	int long_index;
 
-	/* initilize device with default params */
+	/* initialize device with default params */
 	dev->job = DEVICE_JOB_TX;
 	dev->host_port = HOST_PORT;
 	dev->target_port = TARGET_PORT;
@@ -84,32 +84,32 @@ static int init_device(int argc, char **argv,
 	};
 
 	/* loop till all input arguments dispatched(if any) */
-	for(ever) {
+	for (;;) {
 		opt = getopt_long(argc, argv, "+d:h::i:j:s:t:",
 				  longopts, &long_index);
-		if(-1 == opt)
+		if (-1 == opt)
 			break;
 
-		switch(opt) {
-			case 'd':
-				memcpy(dev->ev_dev, optarg, 20);
-				break;
-			case 'i':
-				memcpy(dev->end_ip, optarg, 16);
-				break;
-			case 'j':
-				dev->job = atoi(optarg);
-				break;
-			case 's':
-				dev->host_port = atoi(optarg);
-				break;
-			case 't':
-				dev->target_port = atoi(optarg);
-				break;
-			case 'h':
-			default:
-				usage(argv[0]);
-				exit(0);
+		switch (opt) {
+		case 'd':
+			memcpy(dev->ev_dev, optarg, 20);
+			break;
+		case 'i':
+			memcpy(dev->end_ip, optarg, 16);
+			break;
+		case 'j':
+			dev->job = atoi(optarg);
+			break;
+		case 's':
+			dev->host_port = atoi(optarg);
+			break;
+		case 't':
+			dev->target_port = atoi(optarg);
+			break;
+		case 'h':
+		default:
+			usage(argv[0]);
+			exit(0);
 		}
 	}
 	optind = 1;
@@ -122,36 +122,35 @@ static void dispatch_data(struct input_event *event,
 {
 	int i;
 
-	for(i = 0; i < obj; i++) {
+	for (i = 0; i < obj; i++) {
 		struct input_event *ev;
 		int valid = 1;
 		int obj_len = sizeof(struct input_event);
 
 		ev  = event + i*obj_len;
-		switch(ev->type) {
-			case EV_KEY:
-				if(ev->value != 0
-				   && ev->value != 1)
-					valid = 0;
-				break;
-			case EV_REL:
-				if((ev->code != REL_X)
-				   && (ev->code != REL_Y)
-				   && (ev->code != REL_WHEEL))
-					valid = 0;
-				break;
-			case EV_SYN:
-				if(ev->value != 0)
-					valid = 0;
-				break;
-			default:
+		switch (ev->type) {
+		case EV_KEY:
+			if (ev->value != 0
+			    && ev->value != 1)
 				valid = 0;
-				break;
+			break;
+		case EV_REL:
+			if ((ev->code != REL_X)
+			    && (ev->code != REL_Y)
+			    && (ev->code != REL_WHEEL))
+				valid = 0;
+			break;
+		case EV_SYN:
+			if (ev->value != 0)
+				valid = 0;
+			break;
+		default:
+			valid = 0;
+			break;
 		}
-		if(valid) {
-			if(obj_len != write(fd, ev, obj_len)) {
+		if (valid) {
+			if (obj_len != write(fd, ev, obj_len))
 				DBG("ERROR : WRITING DATA\n");
-			}
 		}
 	}
 }
@@ -161,16 +160,16 @@ static void device_job_tx_loop(struct device *dev)
 	ssize_t len;
 	struct input_event event;
 
-	for(ever) {
+	for (;;) {
 		memset(&event, 0, sizeof(event));
 		len = read(dev->ev_desc, &event, sizeof(event));
-		if(len != sizeof(event)) {
+		if (len != sizeof(event)) {
 			DBG("ERROR : READING DATA\n");
 			continue;
 		}
-		if(event.type < EV_MSC) {
+		if (event.type < EV_MSC) {
 			len = transmit_udp_data(&event, len);
-			if(len < 0) {
+			if (len < 0) {
 				DBG("ERROR : TRANSMITTING DATA\n");
 				continue;
 			}
@@ -184,10 +183,10 @@ static void device_job_rx_loop(struct device *dev)
 	ssize_t len = 0;
 	struct input_event event[10];
 
-	for(ever) {
+	for (;;) {
 		memset(event, 0, sizeof(event));
 		len = receive_udp_data(event, sizeof(event));
-		if(len < 0) {
+		if (len < 0) {
 			DBG("ERROR : RECEIVING DATA\n");
 			continue;
 		} else {
@@ -204,12 +203,11 @@ int main(int argc, char **argv)
 {
 	struct device *dev = calloc(1, sizeof(struct device));
 
-	if(system("clear") < 0) {
-		ERR("ERROR : COULD NOT CLEAR THE SCREEN\n");;
-	}
-	if(NULL != dev) {
+	if (system("clear") < 0)
+		ERR("ERROR : COULD NOT CLEAR THE SCREEN\n");
+	if (dev != NULL) {
 		dev->ev_desc = init_device(argc, argv, dev);
-		if(0 > dev->ev_desc) {
+		if (dev->ev_desc < 0) {
 			ERR("ERROR : INIT DEVICE\n");
 			return -1;
 		}
@@ -218,9 +216,9 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	if(init_udp(dev->end_ip,
-		    dev->host_port,
-		    dev->target_port) < 0) {
+	if (init_udp(dev->end_ip,
+		     dev->host_port,
+		     dev->target_port) < 0) {
 		ERR("ERROR : INIT UDP SOCKET\n");
 		return -1;
 	}
@@ -232,16 +230,16 @@ int main(int argc, char **argv)
 	DBG(" dev->end_ip      = %s\n", dev->end_ip);
 	DBG(" dev->ev_dev      = %s\n", dev->ev_dev);
 	DBG("#*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*#\n");
-	switch(dev->job) {
-		case DEVICE_JOB_TX:
-			device_job_tx_loop(dev);
-			break;
-		case DEVICE_JOB_RX:
-			device_job_rx_loop(dev);
-			break;
-		default:
-			ERR("ERROR : UNKNOWN JOB\n");
-			break;
+	switch (dev->job) {
+	case DEVICE_JOB_TX:
+		device_job_tx_loop(dev);
+		break;
+	case DEVICE_JOB_RX:
+		device_job_rx_loop(dev);
+		break;
+	default:
+		ERR("ERROR : UNKNOWN JOB\n");
+		break;
 	}
 	close(dev->ev_desc);
 	term_udp();

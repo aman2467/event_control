@@ -13,7 +13,6 @@
 #define DBG(format, args...)
 #endif
 #define ERR(format, args...) printf(format, ## args)
-#define ever ;;
 
 enum device_job {
 	DEVICE_JOB_RX = 0,

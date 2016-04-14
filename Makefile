@@ -36,11 +36,11 @@ all: ${PROJECT}
 
 ${PROJECT}:
 	${VERBOSE}${CC} $(SRC_DIR)/${PROJECT}.c $(HELPER_DIR)/socket.c ${CFLAGS} ${CPPFLAGS} -o ${BIN_DIR}/${PROJECT} ${LIBS}
-	${VERBOSE}echo "${BOLD}All ${GREEN}Done${BOLD}..!!${NONE}"
+	${VERBOSE}echo -e "${BOLD}All ${GREEN}Done${BOLD}..!!${NONE}"
 
 clean:
 	${VERBOSE}rm -f $(BIN_DIR)/*
-	${VERBOSE}echo "${BOLD}All ${RED}Cleaned${NONE}"
+	${VERBOSE}echo -e "${BOLD}All ${RED}Cleaned${NONE}"
 
 cscope:
 	${VERBOSE}rm -f cscope.*
